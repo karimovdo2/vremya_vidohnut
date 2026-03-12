@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-mist text-slate-700 antialiased;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+  @apply rounded-3xl bg-white/70 p-4 shadow-soft backdrop-blur-md;
+}
+
+.section-title {
+  @apply text-base font-semibold text-slate-700;
+}
