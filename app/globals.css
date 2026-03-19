@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-mist text-slate-700 antialiased;
+  font-family: 'Nunito', 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.card {
+  @apply rounded-[32px] border border-white/60 bg-white/68 p-5 shadow-soft backdrop-blur-md;
+}
+
+.section-title {
+  @apply text-base font-semibold text-slate-700;
+}
