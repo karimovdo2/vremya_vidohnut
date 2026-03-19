@@ -69,7 +69,7 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
 
   return (
     <section className="card space-y-5">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Интерактив</p>
           <h2 className="mt-1 text-2xl font-semibold text-slate-700">Рисовать на стекле</h2>
@@ -79,20 +79,33 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setResetVersion((value) => value + 1)}
-        className="rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(224,231,238,0.72))] px-5 py-4 text-left shadow-sm backdrop-blur-md"
-      >
-        <span className="block text-lg font-medium text-slate-700">Запотевшее стекло</span>
-        <span className="mt-1 block text-sm text-slate-500">Если хотите начать заново, нажмите сюда и конденсат появится снова.</span>
-      </button>
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
+        <div>
+          <button
+            type="button"
+            onClick={() => setResetVersion((value) => value + 1)}
+            className="mb-4 w-full rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(224,231,238,0.72))] px-5 py-4 text-left shadow-sm backdrop-blur-md"
+          >
+            <span className="block text-lg font-medium text-slate-700">Запотевшее стекло</span>
+            <span className="mt-1 block text-sm text-slate-500">Нажмите сюда, чтобы снова покрыть стекло конденсатом и начать заново.</span>
+          </button>
 
-      <div className={`relative overflow-hidden rounded-[30px] border border-white/60 ${compact ? 'h-72' : 'h-[72vh] min-h-[520px]'}`}>
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(181,201,216,0.85),rgba(146,169,189,0.92))]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.35),transparent_48%)]" />
-        <div className="absolute inset-0 flex items-center justify-center text-[120px] text-white/30">♡</div>
-        <canvas ref={canvasRef} className="absolute inset-0 h-full w-full touch-none" />
+          <div className={`relative overflow-hidden rounded-[30px] border border-white/60 ${compact ? 'h-72' : 'h-[72vh] min-h-[520px]'}`}>
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(181,201,216,0.85),rgba(146,169,189,0.92))]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.35),transparent_48%)]" />
+            <div className="absolute inset-0 flex items-center justify-center text-[120px] text-white/30">♡</div>
+            <canvas ref={canvasRef} className="absolute inset-0 h-full w-full touch-none" />
+          </div>
+        </div>
+
+        <aside className="rounded-[30px] border border-white/60 bg-white/55 p-5">
+          <p className="text-sm font-semibold text-slate-700">Мягкие подсказки</p>
+          <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-500">
+            <li>• Сначала просто рисуйте линии и не пытайтесь сделать что-то идеально.</li>
+            <li>• Можно медленно выдыхать во время движения пальца по стеклу.</li>
+            <li>• Если хочется начать заново — снова нажмите кнопку выше.</li>
+          </ul>
+        </aside>
       </div>
     </section>
   );

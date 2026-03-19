@@ -52,19 +52,47 @@ export function BreathingPractice() {
 
   return (
     <section className="card space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Практика</p>
-        <h2 className="mt-1 text-2xl font-semibold text-slate-700">Дыхание 4 · 4 · 6</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Практика</p>
+          <h2 className="mt-1 text-2xl font-semibold text-slate-700">Дыхание 4 · 4 · 6</h2>
+        </div>
+        <div className="rounded-full bg-sky-100 px-4 py-2 text-xs font-medium text-sky-700">
+          Рекомендация: 3–5 минут спокойного цикла
+        </div>
       </div>
 
-      <div className="rounded-[32px] border border-white/60 bg-gradient-to-b from-white via-sky-50/80 to-white p-5">
-        <div className="mx-auto flex h-64 w-64 items-center justify-center rounded-full border-[6px] border-sky-300/70 bg-[radial-gradient(circle_at_center,rgba(223,237,246,0.92),rgba(184,212,230,0.65))] transition-transform duration-700 ease-in-out md:h-72 md:w-72">
-          <div
-            className={`flex h-52 w-52 flex-col items-center justify-center rounded-full border-2 border-white/80 bg-white/40 text-center backdrop-blur-md transition-transform duration-700 ${phaseClass}`}
-          >
-            <span className="text-4xl font-light text-slate-700">{stage.label}</span>
-            <span className="mt-3 text-sm text-slate-500">{steps.map((item) => item.duration).join(' | ')}</span>
-            <span className="mt-2 text-2xl font-medium text-slate-600">{remaining}</span>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="rounded-[32px] border border-white/60 bg-gradient-to-b from-white via-sky-50/80 to-white p-5">
+          <div className="mx-auto flex h-64 w-64 items-center justify-center rounded-full border-[6px] border-sky-300/70 bg-[radial-gradient(circle_at_center,rgba(223,237,246,0.92),rgba(184,212,230,0.65))] transition-transform duration-700 ease-in-out md:h-72 md:w-72">
+            <div
+              className={`flex h-52 w-52 flex-col items-center justify-center rounded-full border-2 border-white/80 bg-white/40 text-center backdrop-blur-md transition-transform duration-700 ${phaseClass}`}
+            >
+              <span className="text-4xl font-light text-slate-700">{stage.label}</span>
+              <span className="mt-3 text-sm text-slate-500">{steps.map((item) => item.duration).join(' | ')}</span>
+              <span className="mt-2 text-2xl font-medium text-slate-600">{remaining}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-[32px] border border-white/60 bg-white/50 p-5">
+          <p className="text-sm font-semibold text-slate-700">Ход практики</p>
+          <div className="mt-4 space-y-3">
+            {steps.map((item, index) => {
+              const active = index === stepIndex;
+
+              return (
+                <div
+                  key={item.label}
+                  className={`rounded-[22px] border px-4 py-3 text-sm ${
+                    active ? 'border-sky-500/50 bg-sky-600 text-white' : 'border-slate-200 bg-white/80 text-slate-600'
+                  }`}
+                >
+                  <div className="font-semibold">{item.label}</div>
+                  <div className={`mt-1 text-xs ${active ? 'text-white/80' : 'text-slate-400'}`}>{item.duration} секунд</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

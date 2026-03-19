@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { scenes } from '@/lib/content';
 import { SceneId } from '@/lib/types';
 
@@ -37,6 +37,10 @@ export function NatureAudio({ activeScene }: NatureAudioProps) {
     });
   }, [selectedTrack, isPlaying]);
 
+  const audioMode = useMemo(() => {
+    return selectedTrack === activeScene ? 'Авто-режим активен' : 'Выбран ручной режим';
+  }, [activeScene, selectedTrack]);
+
   const togglePlayback = async () => {
     if (!audioRef.current) return;
 
@@ -56,13 +60,15 @@ export function NatureAudio({ activeScene }: NatureAudioProps) {
 
   return (
     <section className="card space-y-4">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Звуки природы</p>
           <h3 className="mt-1 text-xl font-semibold text-slate-700">Фон подстраивается под выбранную тему</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Если вы меняете сцену комнаты, рекомендуемый звук переключается автоматически.</p>
         </div>
-        <div className="rounded-2xl border border-white/70 bg-white/70 px-3 py-2 text-right text-xs text-slate-500">
-          Сейчас: <span className="font-medium text-slate-700">{scenes[selectedTrack].soundLabel}</span>
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-700">{audioMode}</span>
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600">Сейчас: {scenes[selectedTrack].soundLabel}</span>
         </div>
       </div>
 
@@ -75,11 +81,12 @@ export function NatureAudio({ activeScene }: NatureAudioProps) {
               key={sceneId}
               type="button"
               onClick={() => setSelectedTrack(sceneId)}
-              className={`rounded-2xl border px-4 py-3 text-sm transition ${
+              className={`rounded-[22px] border px-4 py-4 text-sm transition ${
                 active ? 'border-sky-500/50 bg-sky-600 text-white' : 'border-slate-200 bg-white/80 text-slate-600'
               }`}
             >
-              {scenes[sceneId].soundLabel}
+              <div className="text-base font-semibold">{scenes[sceneId].soundLabel}</div>
+              <div className={`mt-1 text-xs ${active ? 'text-white/80' : 'text-slate-400'}`}>{scenes[sceneId].soundPath}</div>
             </button>
           );
         })}
@@ -107,11 +114,16 @@ export function NatureAudio({ activeScene }: NatureAudioProps) {
           />
           <span className="text-xl text-slate-500">🔊</span>
         </div>
-        <p className="mt-3 text-xs leading-5 text-slate-500">
-          Для локальной проверки положите файлы <code className="rounded bg-white/60 px-1">forest.wav</code>,{' '}
-          <code className="rounded bg-white/60 px-1">rain.wav</code> и <code className="rounded bg-white/60 px-1">sea.wav</code>{' '}
-          в <code className="rounded bg-white/60 px-1">public/sounds</code>.
-        </p>
+        <div className="mt-4 grid gap-2 text-xs leading-5 text-slate-500 sm:grid-cols-2">
+          <div className="rounded-2xl bg-white/60 p-3">
+            Для локальной проверки положите файлы <code className="rounded bg-slate-100 px-1">forest.wav</code>,{' '}
+            <code className="rounded bg-slate-100 px-1">rain.wav</code> и <code className="rounded bg-slate-100 px-1">sea.wav</code> в{' '}
+            <code className="rounded bg-slate-100 px-1">public/sounds</code>.
+          </div>
+          <div className="rounded-2xl bg-white/60 p-3">
+            Если браузер блокирует autoplay, достаточно один раз нажать кнопку воспроизведения вручную.
+          </div>
+        </div>
       </div>
 
       <audio
