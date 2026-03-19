@@ -1,9 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export function FoggyWindow() {
+type FoggyWindowProps = {
+  compact?: boolean;
+};
+
+export function FoggyWindow({ compact = false }: FoggyWindowProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [resetVersion, setResetVersion] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -16,45 +21,91 @@ export function FoggyWindow() {
       const size = canvas.getBoundingClientRect();
       canvas.width = size.width;
       canvas.height = size.height;
-      context.fillStyle = 'rgba(230, 236, 245, 0.92)';
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = 'rgba(233, 238, 244, 0.92)';
       context.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < 90; i += 1) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const radius = Math.random() * 3 + 1;
+        context.fillStyle = 'rgba(255,255,255,0.35)';
+        context.beginPath();
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.fill();
+      }
     };
 
     setup();
 
     const erase = (x: number, y: number) => {
       context.globalCompositeOperation = 'destination-out';
-      const gradient = context.createRadialGradient(x, y, 8, x, y, 34);
-      gradient.addColorStop(0, 'rgba(255,255,255,0.8)');
+      const gradient = context.createRadialGradient(x, y, 10, x, y, compact ? 32 : 54);
+      gradient.addColorStop(0, 'rgba(255,255,255,0.95)');
       gradient.addColorStop(1, 'rgba(255,255,255,0)');
       context.fillStyle = gradient;
       context.beginPath();
-      context.arc(x, y, 34, 0, Math.PI * 2);
+      context.arc(x, y, compact ? 32 : 54, 0, Math.PI * 2);
       context.fill();
       context.globalCompositeOperation = 'source-over';
     };
 
-    const pointerMove = (event: PointerEvent) => {
+    const handlePointer = (event: PointerEvent) => {
+      if ((event.buttons & 1) !== 1 && event.pointerType === 'mouse') return;
       const rect = canvas.getBoundingClientRect();
       erase(event.clientX - rect.left, event.clientY - rect.top);
     };
 
-    canvas.addEventListener('pointermove', pointerMove);
+    canvas.addEventListener('pointermove', handlePointer);
+    canvas.addEventListener('pointerdown', handlePointer);
     window.addEventListener('resize', setup);
 
     return () => {
-      canvas.removeEventListener('pointermove', pointerMove);
+      canvas.removeEventListener('pointermove', handlePointer);
+      canvas.removeEventListener('pointerdown', handlePointer);
       window.removeEventListener('resize', setup);
     };
-  }, []);
+  }, [compact, resetVersion]);
 
   return (
-    <section className="card space-y-3">
-      <h2 className="section-title">Успокаивающий интерактив</h2>
-      <p className="text-sm text-slate-500">Проведите пальцем по окну и мягко «сотрите» запотевание.</p>
-      <div className="relative h-40 overflow-hidden rounded-2xl bg-gradient-to-b from-slate-300 via-sky-200 to-cyan-100">
-        <div className="absolute inset-0 flex items-center justify-center text-4xl">🌫️</div>
-        <canvas ref={canvasRef} className="absolute inset-0 h-full w-full touch-none" />
+    <section className="card space-y-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Интерактив</p>
+          <h2 className="mt-1 text-2xl font-semibold text-slate-700">Рисовать на стекле</h2>
+        </div>
+        <div className="rounded-2xl border border-white/60 bg-white/60 px-4 py-2 text-sm text-slate-500">
+          Ведите пальцем или мышкой
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
+        <div>
+          <button
+            type="button"
+            onClick={() => setResetVersion((value) => value + 1)}
+            className="mb-4 w-full rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(224,231,238,0.72))] px-5 py-4 text-left shadow-sm backdrop-blur-md"
+          >
+            <span className="block text-lg font-medium text-slate-700">Запотевшее стекло</span>
+            <span className="mt-1 block text-sm text-slate-500">Нажмите сюда, чтобы снова покрыть стекло конденсатом и начать заново.</span>
+          </button>
+
+          <div className={`relative overflow-hidden rounded-[30px] border border-white/60 ${compact ? 'h-72' : 'h-[72vh] min-h-[520px]'}`}>
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(181,201,216,0.85),rgba(146,169,189,0.92))]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.35),transparent_48%)]" />
+            <div className="absolute inset-0 flex items-center justify-center text-[120px] text-white/30">♡</div>
+            <canvas ref={canvasRef} className="absolute inset-0 h-full w-full touch-none" />
+          </div>
+        </div>
+
+        <aside className="rounded-[30px] border border-white/60 bg-white/55 p-5">
+          <p className="text-sm font-semibold text-slate-700">Мягкие подсказки</p>
+          <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-500">
+            <li>• Сначала просто рисуйте линии и не пытайтесь сделать что-то идеально.</li>
+            <li>• Можно медленно выдыхать во время движения пальца по стеклу.</li>
+            <li>• Если хочется начать заново — снова нажмите кнопку выше.</li>
+          </ul>
+        </aside>
       </div>
     </section>
   );

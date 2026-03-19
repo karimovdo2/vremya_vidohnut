@@ -11,3 +11,9 @@ pnpm-debug.log*
 public/sounds/*.wav
 public/sounds/*.mp3
 public/sounds/*.ogg
+
+# Local background images for room scenes
+public/backgrounds/*.jpg
+public/backgrounds/*.jpeg
+public/backgrounds/*.png
+public/backgrounds/*.webp
