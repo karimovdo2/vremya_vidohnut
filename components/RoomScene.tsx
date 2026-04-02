@@ -47,22 +47,9 @@ export function RoomScene({ activeScene, onChange, onExpand, isExpanded = false 
           <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-800/20 to-transparent" />
           <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-800/20 to-transparent" />
 
-          <div className="absolute inset-x-0 top-0 p-4">
-            <div className="inline-flex rounded-full border border-white/60 bg-white/55 px-3 py-2 text-xs font-medium text-slate-600 backdrop-blur-md">
-              {scene.accent} Сейчас выбрана сцена «{scene.label}»
-            </div>
-          </div>
 
-          <div className="absolute inset-x-0 bottom-0 p-5">
-            <div className="max-w-xl rounded-[24px] border border-white/55 bg-white/50 p-4 backdrop-blur-md">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{scene.accent} {scene.label}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-700">{scene.ambience}</p>
-              <div className="mt-4 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/45 px-3 py-2">Фоновая картинка подключается из <code className="rounded bg-white/60 px-1">public/backgrounds</code>.</div>
-                <div className="rounded-2xl bg-white/45 px-3 py-2">Сцена автоматически синхронизирует рекомендуемый звук природы.</div>
-              </div>
-            </div>
-          </div>
+
+         
         </div>
       </div>
 

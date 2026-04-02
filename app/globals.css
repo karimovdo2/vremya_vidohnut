@@ -10,11 +10,6 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  @apply bg-mist text-slate-700 antialiased;
-  font-family: 'Nunito', 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
 button,
 input,
 textarea,
@@ -23,7 +18,8 @@ select {
 }
 
 .card {
-  @apply rounded-[32px] border border-white/60 bg-white/68 p-5 shadow-soft backdrop-blur-md;
+  @apply rounded-[32px] border border-white/60 p-5 shadow-soft backdrop-blur-md;
+  background: rgba(255, 255, 255, 0.68);
 }
 
 .section-title {
