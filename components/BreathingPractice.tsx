@@ -11,7 +11,7 @@ const steps = [
 export function BreathingPractice() {
   const [isRunning, setIsRunning] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const [remaining, setRemaining] = useState(steps[0].duration);
+  const [remaining, setRemaining] = useState<number>(steps[0].duration);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -62,7 +62,7 @@ export function BreathingPractice() {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="space-y-4">
         <div className="rounded-[32px] border border-white/60 bg-gradient-to-b from-white via-sky-50/80 to-white p-5">
           <div className="mx-auto flex h-64 w-64 items-center justify-center rounded-full border-[6px] border-sky-300/70 bg-[radial-gradient(circle_at_center,rgba(223,237,246,0.92),rgba(184,212,230,0.65))] transition-transform duration-700 ease-in-out md:h-72 md:w-72">
             <div
@@ -77,14 +77,14 @@ export function BreathingPractice() {
 
         <div className="rounded-[32px] border border-white/60 bg-white/50 p-5">
           <p className="text-sm font-semibold text-slate-700">Ход практики</p>
-          <div className="mt-4 space-y-3">
+          <div className="mt-4 grid grid-cols-3 gap-3">
             {steps.map((item, index) => {
               const active = index === stepIndex;
 
               return (
                 <div
                   key={item.label}
-                  className={`rounded-[22px] border px-4 py-3 text-sm ${
+                  className={`rounded-[22px] border px-3 py-3 text-sm ${
                     active ? 'border-sky-500/50 bg-sky-600 text-white' : 'border-slate-200 bg-white/80 text-slate-600'
                   }`}
                 >
