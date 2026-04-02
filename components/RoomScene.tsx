@@ -33,23 +33,13 @@ export function RoomScene({ activeScene, onChange, onExpand, isExpanded = false 
 
       <div className="card overflow-hidden p-3 md:p-4">
         <div
-          className="relative min-h-[320px] overflow-hidden rounded-[28px] border border-white/60"
+          className="relative mx-auto aspect-[3/4] w-full max-w-[560px] overflow-hidden rounded-[28px] border border-white/60"
           style={{
             backgroundImage: `${scene.fallback}, url(${scene.imagePath})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
         >
-          <div className="absolute inset-0 bg-white/28 backdrop-blur-[1.5px]" />
-          <div className="absolute inset-y-0 left-[18%] w-5 bg-slate-700/15" />
-          <div className="absolute inset-y-0 left-1/2 w-4 -translate-x-1/2 bg-slate-700/20" />
-          <div className="absolute inset-y-0 right-[18%] w-5 bg-slate-700/15" />
-          <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-800/20 to-transparent" />
-          <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-800/20 to-transparent" />
-
-
-
-         
         </div>
       </div>
 
