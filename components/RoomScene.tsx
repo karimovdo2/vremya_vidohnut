@@ -35,9 +35,10 @@ export function RoomScene({ activeScene, onChange, onExpand, isExpanded = false 
         <div
           className="relative aspect-[3/4] min-h-[420px] overflow-hidden rounded-[28px] border border-white/60"
           style={{
-            backgroundImage: `${scene.fallback}, url(${scene.imagePath})`,
+            backgroundImage: `url(${scene.imagePath})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
+            backgroundColor: '#dce5e3'
           }}
           aria-label={`Сцена: ${scene.label}`}
         />
