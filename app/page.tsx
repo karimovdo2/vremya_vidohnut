@@ -9,6 +9,7 @@ import { RoomScene } from '@/components/RoomScene';
 import { scenes } from '@/lib/content';
 import { AppTab, SceneId } from '@/lib/types';
 
+
 const tabs: Array<{ id: AppTab; label: string; icon: string; description: string }> = [
   { id: 'room', label: 'Комната', icon: '⌂', description: 'Окно, тема комнаты и атмосферный фон.' },
   { id: 'breathing', label: 'Практики', icon: '✿', description: 'Дыхание 4 · 4 · 6 в спокойном темпе.' },
