@@ -30,11 +30,17 @@ export function MoodJournal() {
 
     try {
       const parsed = JSON.parse(raw) as MoodEntry[];
-      setEntries(parsed);
+      if (Array.isArray(parsed)) {
+        setEntries(parsed);
+      }
     } catch {
       localStorage.removeItem(STORAGE_KEY);
     }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }, [entries]);
 
   useEffect(() => {
     return () => {
@@ -114,6 +120,19 @@ export function MoodJournal() {
     setVoiceNote(undefined);
   };
 
+  const deleteEntry = (entryId: string) => {
+    setEntries((previous) => previous.filter((entry) => entry.id !== entryId));
+  };
+
+  const clearAllEntries = () => {
+    if (entries.length === 0) return;
+
+    const confirmed = window.confirm('Удалить всю историю дневника с этого устройства?');
+    if (!confirmed) return;
+
+    setEntries([]);
+  };
+
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     const item: MoodEntry = {
@@ -129,9 +148,7 @@ export function MoodJournal() {
       createdAt: new Date().toISOString()
     };
 
-    const next = [item, ...entries].slice(0, 12);
-    setEntries(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    setEntries((previous) => [item, ...previous].slice(0, 50));
     resetForm();
   };
 
@@ -141,7 +158,7 @@ export function MoodJournal() {
         <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Дневник состояния</p>
         <h2 className="mt-1 text-2xl font-semibold text-slate-700">Лист для свободной выгрузки мыслей</h2>
         <p className="mt-2 text-sm leading-6 text-slate-500">
-          Автоматически фиксируется дата. Можно писать без ограничения по объёму и при желании добавить голосовую заметку.
+          Записи сохраняются только локально в вашем браузере на этом устройстве. Никаких логинов и регистрации не требуется.
         </p>
       </div>
 
@@ -298,14 +315,34 @@ export function MoodJournal() {
       </form>
 
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-slate-700">История</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-slate-700">История ({entries.length})</h3>
+          <button
+            type="button"
+            onClick={clearAllEntries}
+            disabled={entries.length === 0}
+            className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Очистить всю историю
+          </button>
+        </div>
+
         {entries.length === 0 && <p className="text-sm text-slate-400">Пока нет сохранённых записей.</p>}
         <ul className="space-y-4">
           {entries.map((entry) => (
             <li key={entry.id} className="rounded-[28px] border border-white/70 bg-white/70 p-4 shadow-soft">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm font-semibold text-slate-700">{new Date(entry.createdAt).toLocaleString('ru-RU')}</p>
-                <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-700">Состояние {entry.score}/10</span>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-700">Состояние {entry.score}/10</span>
+                  <button
+                    type="button"
+                    onClick={() => deleteEntry(entry.id)}
+                    className="rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-medium text-rose-600"
+                  >
+                    Удалить
+                  </button>
+                </div>
               </div>
               <div className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
                 {entry.moodSummary && <p><span className="font-medium text-slate-700">Чувства:</span> {entry.moodSummary}</p>}
