@@ -5,6 +5,20 @@ import { emotionGroups } from '@/lib/content';
 import { EmotionRating, MoodEntry } from '@/lib/types';
 
 const STORAGE_KEY = 'calm-journal-v2';
+const VOICE_UNAVAILABLE_MESSAGE = 'Голосовая запись недоступна на этом устройстве или в этом браузере.';
+
+const isVoiceRecordingSupported = () => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  return typeof MediaRecorder !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia);
+};
+
+const createEntryId = () => {
+  if (typeof window !== 'undefined' && window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  return `entry-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
 
 export function MoodJournal() {
   const [score, setScore] = useState(5);
@@ -17,13 +31,18 @@ export function MoodJournal() {
   const [selectedEmotions, setSelectedEmotions] = useState<Record<string, number>>({});
   const [isRecording, setIsRecording] = useState(false);
   const [voiceNote, setVoiceNote] = useState<string>();
-  const [recorderSupported, setRecorderSupported] = useState(false);
+  const [isVoiceSupported, setIsVoiceSupported] = useState(false);
+  const [voiceSupportMessage, setVoiceSupportMessage] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
-    setRecorderSupported(typeof window !== 'undefined' && 'MediaRecorder' in window && 'navigator' in window);
+    const supported = isVoiceRecordingSupported();
+    setIsVoiceSupported(supported);
+    if (!supported) {
+      setVoiceSupportMessage(VOICE_UNAVAILABLE_MESSAGE);
+    }
 
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
@@ -71,37 +90,54 @@ export function MoodJournal() {
   };
 
   const startRecording = async () => {
-    if (!recorderSupported) return;
+    if (!isVoiceRecordingSupported()) {
+      setIsVoiceSupported(false);
+      setVoiceSupportMessage(VOICE_UNAVAILABLE_MESSAGE);
+      return;
+    }
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    streamRef.current = stream;
-    chunksRef.current = [];
+    const getUserMedia = navigator.mediaDevices?.getUserMedia;
+    if (!getUserMedia) {
+      setIsVoiceSupported(false);
+      setVoiceSupportMessage(VOICE_UNAVAILABLE_MESSAGE);
+      return;
+    }
 
-    const mediaRecorder = new MediaRecorder(stream);
-    mediaRecorderRef.current = mediaRecorder;
+    try {
+      setVoiceSupportMessage(null);
+      const stream = await getUserMedia.call(navigator.mediaDevices, { audio: true });
+      streamRef.current = stream;
+      chunksRef.current = [];
 
-    mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        chunksRef.current.push(event.data);
-      }
-    };
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
 
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setVoiceNote(typeof reader.result === 'string' ? reader.result : undefined);
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
       };
-      reader.readAsDataURL(blob);
 
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-      }
-    };
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setVoiceNote(typeof reader.result === 'string' ? reader.result : undefined);
+        };
+        reader.readAsDataURL(blob);
 
-    mediaRecorder.start();
-    setIsRecording(true);
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch {
+      setIsRecording(false);
+      setVoiceSupportMessage(VOICE_UNAVAILABLE_MESSAGE);
+    }
   };
 
   const stopRecording = () => {
@@ -136,7 +172,7 @@ export function MoodJournal() {
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     const item: MoodEntry = {
-      id: crypto.randomUUID(),
+      id: createEntryId(),
       score,
       moodSummary: moodSummary.trim(),
       bodyFeeling: bodyFeeling.trim(),
@@ -295,15 +331,15 @@ export function MoodJournal() {
             <button
               type="button"
               onClick={isRecording ? stopRecording : startRecording}
-              disabled={!recorderSupported}
+              disabled={!isVoiceSupported}
               className="rounded-2xl bg-slate-700 px-4 py-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-slate-300"
             >
               {isRecording ? 'Остановить запись' : 'Записать голосом'}
             </button>
             <p className="text-sm text-slate-500">
-              {recorderSupported
+              {isVoiceSupported
                 ? 'Голосовая заметка хранится локально вместе с записью.'
-                : 'Браузер не поддерживает запись голоса в текущей среде.'}
+                : voiceSupportMessage ?? VOICE_UNAVAILABLE_MESSAGE}
             </p>
           </div>
           {voiceNote && <audio controls src={voiceNote} className="mt-4 w-full" />}
