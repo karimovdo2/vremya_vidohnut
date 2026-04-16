@@ -1,5 +1,6 @@
 'use client';
 
+import { ChangeEvent } from 'react';
 import { scenes } from '@/lib/content';
 import { SceneId } from '@/lib/types';
 
@@ -7,11 +8,33 @@ type RoomSceneProps = {
   activeScene: SceneId;
   onChange: (scene: SceneId) => void;
   onExpand: () => void;
+  onCustomImageChange: (value?: string) => void;
+  customImageSrc?: string;
   isExpanded?: boolean;
 };
 
-export function RoomScene({ activeScene, onChange, onExpand, isExpanded = false }: RoomSceneProps) {
+export function RoomScene({
+  activeScene,
+  onChange,
+  onExpand,
+  onCustomImageChange,
+  customImageSrc,
+  isExpanded = false
+}: RoomSceneProps) {
   const scene = scenes[activeScene];
+
+  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = typeof reader.result === 'string' ? reader.result : undefined;
+      onCustomImageChange(result);
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  };
 
   return (
     <section className="space-y-5">
@@ -33,23 +56,37 @@ export function RoomScene({ activeScene, onChange, onExpand, isExpanded = false 
 
       <div className="card overflow-hidden p-3 md:p-4">
         <div
-          className="relative min-h-[320px] overflow-hidden rounded-[28px] border border-white/60"
+          className="relative aspect-[3/4] min-h-[420px] overflow-hidden rounded-[28px] border border-white/60"
           style={{
-            backgroundImage: `${scene.fallback}, url(${scene.imagePath})`,
+            backgroundImage: `url(\"${customImageSrc ?? scene.imagePath}\")`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center',
+            backgroundColor: '#dce5e3'
           }}
-        >
-          <div className="absolute inset-0 bg-white/28 backdrop-blur-[1.5px]" />
-          <div className="absolute inset-y-0 left-[18%] w-5 bg-slate-700/15" />
-          <div className="absolute inset-y-0 left-1/2 w-4 -translate-x-1/2 bg-slate-700/20" />
-          <div className="absolute inset-y-0 right-[18%] w-5 bg-slate-700/15" />
-          <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-800/20 to-transparent" />
-          <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-800/20 to-transparent" />
+          aria-label={`Сцена: ${customImageSrc ? 'Пользовательская картинка' : scene.label}`}
+        />
+      </div>
 
-
-
-         
+      <div className="rounded-[24px] border border-white/70 bg-white/70 p-4">
+        <p className="text-sm font-semibold text-slate-700">Своя картинка</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">Можно загрузить личное фото для окна. Оно сохранится только локально в этом браузере.</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <label className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700">
+            Загрузить изображение
+            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+          </label>
+          <span className={`rounded-full px-3 py-2 text-xs font-medium ${customImageSrc ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+            {customImageSrc ? 'Используется ваша картинка' : 'Сейчас используется тема сцены'}
+          </span>
+          {customImageSrc && (
+            <button
+              type="button"
+              onClick={() => onCustomImageChange(undefined)}
+              className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-medium text-rose-700"
+            >
+              Удалить свою картинку
+            </button>
+          )}
         </div>
       </div>
 

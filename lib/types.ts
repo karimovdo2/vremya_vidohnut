@@ -1,6 +1,6 @@
 export type SceneId = 'forest' | 'rain' | 'sea';
 
-export type AppTab = 'room' | 'breathing' | 'journal' | 'interactive';
+export type AppTab = 'room' | 'breathing' | 'journal' | 'interactive' | 'resources';
 
 export type EmotionRating = {
   name: string;
