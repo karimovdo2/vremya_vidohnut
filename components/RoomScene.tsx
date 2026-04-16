@@ -76,6 +76,7 @@ export function RoomScene({
             Загрузить изображение
             <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
           </label>
+
           {customImageSrc && (
             <button
               type="button"

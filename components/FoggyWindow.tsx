@@ -47,8 +47,10 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
     const erase = (x: number, y: number) => {
       context.globalCompositeOperation = 'destination-out';
 
+
       const radius = compact ? 32 : 52;
       const gradient = context.createRadialGradient(x, y, 10, x, y, radius);
+
       gradient.addColorStop(0, 'rgba(255,255,255,0.96)');
       gradient.addColorStop(1, 'rgba(255,255,255,0)');
       context.fillStyle = gradient;
@@ -62,6 +64,8 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
       const rect = canvas.getBoundingClientRect();
       return { x: event.clientX - rect.left, y: event.clientY - rect.top };
 
+
+fix/current-working-state
     };
 
     const handlePointerDown = (event: PointerEvent) => {
@@ -69,6 +73,7 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
       canvas.setPointerCapture(event.pointerId);
       const point = pointerToCanvas(event);
       erase(point.x, point.y);
+
     };
 
     const handlePointerMove = (event: PointerEvent) => {
@@ -120,6 +125,7 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
       </div>
 
       <div className="space-y-4">
+
 
         <button
           type="button"
