@@ -58,11 +58,12 @@ export function RoomScene({
         <div
           className="relative aspect-[3/4] min-h-[420px] overflow-hidden rounded-[28px] border border-white/60"
           style={{
-            backgroundImage: `url(${customImageSrc ?? scene.imagePath})`,
+
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundColor: '#dce5e3'
           }}
+
           aria-label={`Сцена: ${customImageSrc ? 'Пользовательская картинка' : scene.label}`}
         />
       </div>
@@ -85,6 +86,7 @@ export function RoomScene({
             </button>
           )}
         </div>
+
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">

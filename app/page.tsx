@@ -118,7 +118,8 @@ export default function Home() {
         </section>
       </div>
 
-      <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 gap-2 rounded-[28px] border border-white/70 bg-white/85 p-2 shadow-soft backdrop-blur-md sm:inset-x-auto sm:left-1/2 sm:w-[540px] sm:-translate-x-1/2">
+      <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-4 gap-2 rounded-[28px] border border-white/70 bg-white/85 p-2 shadow-soft backdrop-blur-md sm:inset-x-auto sm:left-1/2 sm:w-[520px] sm:-translate-x-1/2">
+
         {tabs.map((tab) => {
           const active = activeTab === tab.id;
 

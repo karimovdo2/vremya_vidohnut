@@ -46,8 +46,9 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
 
     const erase = (x: number, y: number) => {
       context.globalCompositeOperation = 'destination-out';
-      const radius = compact ? 18 : 30;
-      const gradient = context.createRadialGradient(x, y, 6, x, y, radius);
+
+      const radius = compact ? 32 : 52;
+      const gradient = context.createRadialGradient(x, y, 10, x, y, radius);
       gradient.addColorStop(0, 'rgba(255,255,255,0.96)');
       gradient.addColorStop(1, 'rgba(255,255,255,0)');
       context.fillStyle = gradient;
@@ -60,6 +61,7 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
     const pointerToCanvas = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
       return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+
     };
 
     const handlePointerDown = (event: PointerEvent) => {
@@ -118,21 +120,22 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
       </div>
 
       <div className="space-y-4">
-        <div className="grid gap-2 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => setResetVersion((value) => value + 1)}
-            className="w-full rounded-[20px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(224,231,238,0.72))] px-4 py-3 text-left shadow-sm backdrop-blur-md"
-          >
-            <span className="block text-base font-medium text-slate-700">Обновить запотевание</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsExpanded(true)}
-            className="w-full rounded-[20px] border border-white/70 bg-white/80 px-4 py-3 text-left text-base font-medium text-slate-700 shadow-sm"
-          >
-            Развернуть на весь экран
-          </button>
+
+        <button
+          type="button"
+          onClick={() => setResetVersion((value) => value + 1)}
+          className="w-full rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(224,231,238,0.72))] px-5 py-4 text-left shadow-sm backdrop-blur-md"
+        >
+          <span className="block text-lg font-medium text-slate-700">Запотевшее стекло</span>
+          <span className="mt-1 block text-sm text-slate-500">Нажмите сюда, чтобы снова покрыть стекло конденсатом и начать заново.</span>
+        </button>
+
+        <div className={`relative w-full overflow-hidden rounded-[30px] border border-white/60 ${compact ? 'h-72' : 'h-[62vh] min-h-[420px]'}`}>
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(181,201,216,0.85),rgba(146,169,189,0.92))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.35),transparent_48%)]" />
+          <div className="absolute inset-0 flex items-center justify-center text-[120px] text-white/30">♡</div>
+          <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" style={{ touchAction: 'none' }} />
+
         </div>
 
         {!isExpanded && renderCanvas()}
