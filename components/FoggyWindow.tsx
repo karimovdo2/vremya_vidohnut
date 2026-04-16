@@ -10,6 +10,7 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef(false);
   const [resetVersion, setResetVersion] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,6 +46,7 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
 
     const erase = (x: number, y: number) => {
       context.globalCompositeOperation = 'destination-out';
+
       const radius = compact ? 32 : 52;
       const gradient = context.createRadialGradient(x, y, 10, x, y, radius);
       gradient.addColorStop(0, 'rgba(255,255,255,0.96)');
@@ -59,6 +61,7 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
     const pointerToCanvas = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
       return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+
     };
 
     const handlePointerDown = (event: PointerEvent) => {
@@ -91,7 +94,18 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
       canvas.removeEventListener('pointercancel', handlePointerUp);
       window.removeEventListener('resize', setup);
     };
-  }, [compact, resetVersion]);
+  }, [compact, resetVersion, isExpanded]);
+
+  const canvasHeight = compact ? 'h-72' : isExpanded ? 'h-[78vh] min-h-[520px]' : 'h-[62vh] min-h-[420px]';
+
+  const renderCanvas = () => (
+    <div className={`relative w-full overflow-hidden rounded-[30px] border border-white/60 ${canvasHeight}`}>
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(181,201,216,0.85),rgba(146,169,189,0.92))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.35),transparent_48%)]" />
+      <div className="absolute inset-0 flex items-center justify-center text-[120px] text-white/30">♡</div>
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" style={{ touchAction: 'none' }} />
+    </div>
+  );
 
   return (
     <section className="card space-y-5">
@@ -106,6 +120,7 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
       </div>
 
       <div className="space-y-4">
+
         <button
           type="button"
           onClick={() => setResetVersion((value) => value + 1)}
@@ -120,7 +135,10 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.35),transparent_48%)]" />
           <div className="absolute inset-0 flex items-center justify-center text-[120px] text-white/30">♡</div>
           <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" style={{ touchAction: 'none' }} />
+
         </div>
+
+        {!isExpanded && renderCanvas()}
 
         <aside className="rounded-[30px] border border-white/60 bg-white/55 p-5">
           <p className="text-sm font-semibold text-slate-700">Мягкие подсказки</p>
@@ -131,6 +149,24 @@ export function FoggyWindow({ compact = false }: FoggyWindowProps) {
           </ul>
         </aside>
       </div>
+
+      {isExpanded && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 p-3 backdrop-blur-sm sm:p-6">
+          <div className="mx-auto flex h-full w-full max-w-5xl flex-col rounded-[28px] border border-white/20 bg-white/10 p-4 backdrop-blur-xl sm:p-6">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <p className="text-sm font-medium text-white">Запотевшее стекло — полноэкранный режим</p>
+              <button
+                type="button"
+                onClick={() => setIsExpanded(false)}
+                className="rounded-full border border-white/40 bg-white/20 px-4 py-2 text-sm font-medium text-white"
+              >
+                Закрыть
+              </button>
+            </div>
+            {renderCanvas()}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

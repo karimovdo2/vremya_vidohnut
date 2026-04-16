@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BreathingPractice } from '@/components/BreathingPractice';
 import { FoggyWindow } from '@/components/FoggyWindow';
 import { MoodJournal } from '@/components/MoodJournal';
 import { NatureAudio } from '@/components/NatureAudio';
+import { ResourcesList } from '@/components/ResourcesList';
 import { RoomScene } from '@/components/RoomScene';
 import { scenes } from '@/lib/content';
 import { AppTab, SceneId } from '@/lib/types';
@@ -13,13 +14,31 @@ const tabs: Array<{ id: AppTab; label: string; icon: string; description: string
   { id: 'room', label: 'Комната', icon: '⌂', description: 'Окно, тема комнаты и атмосферный фон.' },
   { id: 'breathing', label: 'Практики', icon: '✿', description: 'Дыхание 4 · 4 · 6 в спокойном темпе.' },
   { id: 'journal', label: 'Дневник', icon: '☰', description: 'Свободная запись, эмоции и голосовая заметка.' },
-  { id: 'interactive', label: 'Интерактив', icon: '✦', description: 'Рисование на запотевшем стекле.' }
+  { id: 'interactive', label: 'Интерактив', icon: '✦', description: 'Рисование на запотевшем стекле.' },
+  { id: 'resources', label: 'Ресурсы', icon: '♡', description: 'Личный список поддерживающих действий при стрессе.' }
 ];
 
 export default function Home() {
   const [scene, setScene] = useState<SceneId>('forest');
   const [activeTab, setActiveTab] = useState<AppTab>('room');
   const [isRoomExpanded, setIsRoomExpanded] = useState(false);
+  const [customRoomImage, setCustomRoomImage] = useState<string>();
+
+  useEffect(() => {
+    const stored = localStorage.getItem('room-custom-image-v1');
+    if (stored) {
+      setCustomRoomImage(stored);
+    }
+  }, []);
+
+  const handleCustomRoomImageChange = (value?: string) => {
+    setCustomRoomImage(value);
+    if (value) {
+      localStorage.setItem('room-custom-image-v1', value);
+    } else {
+      localStorage.removeItem('room-custom-image-v1');
+    }
+  };
 
   const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeTab) ?? tabs[0], [activeTab]);
   const sceneMeta = scenes[scene];
@@ -73,6 +92,8 @@ export default function Home() {
                 activeScene={scene}
                 onChange={setScene}
                 onExpand={() => setIsRoomExpanded(true)}
+                customImageSrc={customRoomImage}
+                onCustomImageChange={handleCustomRoomImageChange}
                 isExpanded={isRoomExpanded}
               />
               <NatureAudio activeScene={scene} />
@@ -90,10 +111,15 @@ export default function Home() {
           <div className={activeTab === 'interactive' ? 'block' : 'hidden'}>
             <FoggyWindow />
           </div>
+
+          <div className={activeTab === 'resources' ? 'block' : 'hidden'}>
+            <ResourcesList />
+          </div>
         </section>
       </div>
 
       <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-4 gap-2 rounded-[28px] border border-white/70 bg-white/85 p-2 shadow-soft backdrop-blur-md sm:inset-x-auto sm:left-1/2 sm:w-[520px] sm:-translate-x-1/2">
+
         {tabs.map((tab) => {
           const active = activeTab === tab.id;
 
@@ -130,6 +156,8 @@ export default function Home() {
                 activeScene={scene}
                 onChange={setScene}
                 onExpand={() => setIsRoomExpanded(false)}
+                customImageSrc={customRoomImage}
+                onCustomImageChange={handleCustomRoomImageChange}
                 isExpanded={true}
               />
               <div className="mt-6">

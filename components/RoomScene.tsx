@@ -1,5 +1,6 @@
 'use client';
 
+import { ChangeEvent } from 'react';
 import { scenes } from '@/lib/content';
 import { SceneId } from '@/lib/types';
 
@@ -7,11 +8,33 @@ type RoomSceneProps = {
   activeScene: SceneId;
   onChange: (scene: SceneId) => void;
   onExpand: () => void;
+  onCustomImageChange: (value?: string) => void;
+  customImageSrc?: string;
   isExpanded?: boolean;
 };
 
-export function RoomScene({ activeScene, onChange, onExpand, isExpanded = false }: RoomSceneProps) {
+export function RoomScene({
+  activeScene,
+  onChange,
+  onExpand,
+  onCustomImageChange,
+  customImageSrc,
+  isExpanded = false
+}: RoomSceneProps) {
   const scene = scenes[activeScene];
+
+  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = typeof reader.result === 'string' ? reader.result : undefined;
+      onCustomImageChange(result);
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  };
 
   return (
     <section className="space-y-5">
@@ -35,13 +58,35 @@ export function RoomScene({ activeScene, onChange, onExpand, isExpanded = false 
         <div
           className="relative aspect-[3/4] min-h-[420px] overflow-hidden rounded-[28px] border border-white/60"
           style={{
-            backgroundImage: `url(${scene.imagePath})`,
+
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundColor: '#dce5e3'
           }}
-          aria-label={`Сцена: ${scene.label}`}
+
+          aria-label={`Сцена: ${customImageSrc ? 'Пользовательская картинка' : scene.label}`}
         />
+      </div>
+
+      <div className="rounded-[24px] border border-white/70 bg-white/70 p-4">
+        <p className="text-sm font-semibold text-slate-700">Своя картинка</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">Можно загрузить личное фото для окна. Оно сохранится только локально в этом браузере.</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <label className="cursor-pointer rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700">
+            Загрузить изображение
+            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+          </label>
+          {customImageSrc && (
+            <button
+              type="button"
+              onClick={() => onCustomImageChange(undefined)}
+              className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-medium text-rose-700"
+            >
+              Удалить свою картинку
+            </button>
+          )}
+        </div>
+
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
